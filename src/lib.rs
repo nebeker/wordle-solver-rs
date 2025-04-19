@@ -48,6 +48,31 @@ pub struct LetterGuess {
 }
 
 #[derive(Debug, PartialEq, Eq)]
+pub struct LetterGuessParseError;
+impl FromStr for LetterGuess {
+    type Err = LetterGuessParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.len() != 2
+        {
+            return Err(LetterGuessParseError);
+        }
+
+        if let Some(letter) = s.chars().nth(1)
+        {
+            if let Some(status_char) = s.chars().nth(0)
+            {
+                if let Ok(status) = LetterGuessStatus::from(status_char)
+                {
+                    return Ok(LetterGuess{letter, position: 0, status});
+                }
+            }
+        }
+        Err(LetterGuessParseError)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
 pub enum WordGuessStatus {
     Incorrect,
     Correct,
@@ -124,5 +149,14 @@ mod tests {
     fn create_word_guess_not_letter() {
         let new_word_guess = WordGuess::from_str("ab!de");
         assert!(new_word_guess.is_err());
+    }
+
+    #[test]
+    fn create_letter_guess() {
+        let mut letter_guess = LetterGuess::from_str("!B");
+        assert!(letter_guess.is_ok());
+        assert_eq!(letter_guess.unwrap().letter, 'B');
+        letter_guess = LetterGuess::from_str("!B");
+        assert_eq!(letter_guess.unwrap().status, LetterGuessStatus::Correct);
     }
 }
