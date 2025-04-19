@@ -1,17 +1,50 @@
+use std::fmt;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Copy)]
+#[repr(u8)]
 pub enum LetterGuessStatus {
     Incorrect,
     Correct,
     IncorrectPosition,
+    Unevaluated,
 }
 
-#[derive(Debug, PartialEq, Eq, Default)]
+impl Default for LetterGuessStatus {
+    fn default() -> Self {
+        LetterGuessStatus::Unevaluated
+    }
+}
+
+impl LetterGuessStatus {
+    pub fn from(c: char) -> Result<LetterGuessStatus, ()> {
+        match c {
+            '?' => Ok(LetterGuessStatus::Unevaluated),
+            '_' => Ok(LetterGuessStatus::IncorrectPosition),
+            'x' => Ok(LetterGuessStatus::Incorrect),
+            '!' => Ok(LetterGuessStatus::Correct),
+            _ => Err(()),
+        }
+    }
+}
+
+impl ToString for LetterGuessStatus {
+    fn to_string(&self) -> String {
+        match self {
+            LetterGuessStatus::Unevaluated => String::from("?"),
+            LetterGuessStatus::IncorrectPosition => String::from("_"),
+            LetterGuessStatus::Incorrect => String::from("x"),
+            LetterGuessStatus::Correct => String::from("!"),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Default, Clone)]
 pub struct LetterGuess {
     letter: char,
     position: usize,
-    status: Option<LetterGuessStatus>,
+    status: LetterGuessStatus,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -22,8 +55,8 @@ pub enum WordGuessStatus {
 
 #[derive(Debug, PartialEq)]
 pub struct WordGuess {
-    letter_guesses: [LetterGuess; 5],
-    status: Option<WordGuessStatus>,
+    pub letter_guesses: [LetterGuess; 5],
+    pub status: Option<WordGuessStatus>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -47,13 +80,24 @@ impl FromStr for WordGuess {
             {
                 return Err(ParseWordGuessError);
             }
-            new_letter_guesses[index] = LetterGuess{letter: l, position: index, status: None,}
+            new_letter_guesses[index] = LetterGuess{letter: l, position: index, status: LetterGuessStatus::Unevaluated,}
         }
 
         Ok(WordGuess{
             letter_guesses: new_letter_guesses,
             status: None,
         })
+    }
+}
+
+impl fmt::Display for WordGuess {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut formatted_word_guess= "".to_owned();
+        for letter in self.letter_guesses.iter() {
+            formatted_word_guess.push_str(letter.status.to_string().as_str());
+            formatted_word_guess.push(letter.letter);
+        }
+        write!(f, "{}", formatted_word_guess)
     }
 }
 
