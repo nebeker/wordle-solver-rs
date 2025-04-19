@@ -91,29 +91,73 @@ impl FromStr for WordGuess {
     type Err = ParseWordGuessError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-
-        if s.len() != 5 || !s.is_ascii()
+        if !s.is_ascii()
         {
             return Err(ParseWordGuessError);
         }
+
+        match s.len() {
+            5 => {let new_letter_guesses = match Self::parse_letters(s) {
+                Ok(value) => value,
+                Err(value) => return value,
+            };
+                Ok(WordGuess{
+                    letter_guesses: new_letter_guesses,
+                    status: None,
+                })}
+            10 => {let new_letter_guesses = match Self::parse_letters_with_status(s) {
+                Ok(value) => value,
+                Err(value) => return value,
+            };
+                Ok(WordGuess{
+                    letter_guesses: new_letter_guesses,
+                    status: None,
+                })}
+            _ => return Err(ParseWordGuessError),
+        }
+    }
+}
+
+impl WordGuess {
+    fn parse_letters(s: &str) -> Result<[LetterGuess; 5], Result<WordGuess, <WordGuess as FromStr>::Err>> {
         let binding = s.to_ascii_uppercase();
         let letters = binding.chars();
-        let mut new_letter_guesses : [LetterGuess; 5] = Default::default();
+        let mut new_letter_guesses: [LetterGuess; 5] = Default::default();
 
         for (index, l) in letters.enumerate() {
             if !l.is_alphabetic()
             {
-                return Err(ParseWordGuessError);
+                return Err(Err(ParseWordGuessError));
             }
-            new_letter_guesses[index] = LetterGuess{letter: l, position: index, status: LetterGuessStatus::Unevaluated,}
+            new_letter_guesses[index] = LetterGuess { letter: l, position: index, status: LetterGuessStatus::Unevaluated, }
         }
+        Ok(new_letter_guesses)
+    }
 
-        Ok(WordGuess{
-            letter_guesses: new_letter_guesses,
-            status: None,
-        })
+    fn parse_letters_with_status(s: &str) -> Result<[LetterGuess; 5], Result<WordGuess, <WordGuess as FromStr>::Err>> {
+        let mut new_letter_guesses: [LetterGuess; 5] = Default::default();
+        let binding = s.chars().collect::<Vec<char>>();
+        let letter_pairs = binding.chunks(2);
+
+        for (index, l) in letter_pairs.enumerate() {
+            let first_letter = l[0];
+            let second_letter = l[1].to_ascii_uppercase();
+            if !second_letter.is_alphabetic()
+            {
+                return Err(Err(ParseWordGuessError));
+            }
+            let pair = first_letter.to_string() + second_letter.to_string().as_str();
+            if let Ok(mut guess) = LetterGuess::from_str(pair.as_str())
+            {
+                guess.position = index;
+                new_letter_guesses[index] = guess;
+            }
+            else { return Err(Err(ParseWordGuessError)); }
+        }
+        Ok(new_letter_guesses)
     }
 }
+
 
 impl fmt::Display for WordGuess {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
