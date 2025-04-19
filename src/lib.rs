@@ -72,16 +72,17 @@ impl FromStr for LetterGuess {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum WordGuessStatus {
     Incorrect,
     Correct,
+    Unevaluated
 }
 
 #[derive(Debug, PartialEq)]
 pub struct WordGuess {
     pub letter_guesses: [LetterGuess; 5],
-    pub status: Option<WordGuessStatus>,
+    pub status: WordGuessStatus,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -103,7 +104,7 @@ impl FromStr for WordGuess {
             };
                 Ok(WordGuess{
                     letter_guesses: new_letter_guesses,
-                    status: None,
+                    status: WordGuessStatus::Unevaluated,
                 })}
             10 => {let new_letter_guesses = match Self::parse_letters_with_status(s) {
                 Ok(value) => value,
@@ -111,7 +112,7 @@ impl FromStr for WordGuess {
             };
                 Ok(WordGuess{
                     letter_guesses: new_letter_guesses,
-                    status: None,
+                    status: WordGuessStatus::Unevaluated,
                 })}
             _ => return Err(ParseWordGuessError),
         }
@@ -156,6 +157,29 @@ impl WordGuess {
         }
         Ok(new_letter_guesses)
     }
+
+    pub fn check_word_guess(& mut self, word: &str) -> WordGuessStatus{
+        let binding = word.to_ascii_uppercase();
+        let mut actual_letters = binding.chars().into_iter();
+        let actual_letter_vec : Vec<char>= actual_letters.clone().collect();
+
+        for (index, letter_guess) in self.letter_guesses.iter().enumerate() {
+            if letter_guess.letter == actual_letter_vec[index]
+            {
+                letter_guess.status == LetterGuessStatus::Correct;
+            }
+            else if actual_letters.any(|l| l==letter_guess.letter){
+                letter_guess.status == LetterGuessStatus::IncorrectPosition;
+            }
+            else {
+                letter_guess.status == LetterGuessStatus::Incorrect;
+            }
+        }
+
+        self.status = if self.letter_guesses.iter().all(|g| g.status == LetterGuessStatus::Correct) { WordGuessStatus::Correct } else { WordGuessStatus::Incorrect };
+
+        return self.status.clone();
+    }
 }
 
 
@@ -177,7 +201,7 @@ mod tests {
     #[test]
     fn create_word_guess() {
         let new_word_guess = WordGuess::from_str("abcde");
-        assert_eq!(new_word_guess.unwrap().status, None);
+        assert_eq!(new_word_guess.unwrap().status, WordGuessStatus::Unevaluated);
         let new_word_guess = WordGuess::from_str("abcde");
         assert_eq!(new_word_guess.unwrap().letter_guesses[0].letter, 'A');
     }
