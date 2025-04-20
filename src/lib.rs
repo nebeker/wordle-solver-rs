@@ -160,19 +160,19 @@ impl WordGuess {
 
     pub fn check_word_guess(& mut self, word: &str) -> WordGuessStatus{
         let binding = word.to_ascii_uppercase();
-        let mut actual_letters = binding.chars().into_iter();
+        let mut actual_letters = binding.chars();
         let actual_letter_vec : Vec<char>= actual_letters.clone().collect();
 
-        for (index, letter_guess) in self.letter_guesses.iter().enumerate() {
-            if letter_guess.letter == actual_letter_vec[index]
+        for index in 0..self.letter_guesses.len() {
+            if self.letter_guesses[index].letter == actual_letter_vec[index]
             {
-                letter_guess.status == LetterGuessStatus::Correct;
+                self.letter_guesses[index].status = LetterGuessStatus::Correct;
             }
-            else if actual_letters.any(|l| l==letter_guess.letter){
-                letter_guess.status == LetterGuessStatus::IncorrectPosition;
+            else if actual_letters.any(|l| l== self.letter_guesses[index].letter){
+                self.letter_guesses[index].status = LetterGuessStatus::IncorrectPosition;
             }
             else {
-                letter_guess.status == LetterGuessStatus::Incorrect;
+                self.letter_guesses[index].status = LetterGuessStatus::Incorrect;
             }
         }
 
