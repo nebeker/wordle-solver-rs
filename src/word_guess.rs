@@ -172,10 +172,11 @@ pub mod word_guess {
 
         #[test]
         fn check_incorrect_word_guess() {
-            let check_result = WordGuess::from_str("acbde")
-                .unwrap()
-                .check_word_guess("abcde");
+            let mut word_guess = WordGuess::from_str("acbde").unwrap();
+            let check_result = word_guess.check_word_guess("abcde");
             assert_eq!(check_result, WordGuessStatus::Incorrect);
+            assert_eq!(word_guess.letter_guesses[1].status, LetterGuessStatus::IncorrectPosition);
+            assert_eq!(word_guess.letter_guesses[2].status, LetterGuessStatus::IncorrectPosition);
         }
     }
 }

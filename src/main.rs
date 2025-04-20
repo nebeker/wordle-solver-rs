@@ -25,7 +25,7 @@ fn main() {
 fn handle_guess(actual_word: &String) -> bool {
     let mut buffer = String::new();
     let stdin = io::stdin();
-    stdin.read_line(&mut buffer);
+    _ = stdin.read_line(&mut buffer);
     let guess = WordGuess::from_str(buffer.trim());
     if guess.is_ok() {
         let mut guess = guess.unwrap();
