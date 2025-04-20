@@ -100,13 +100,13 @@ pub mod word_guess {
 
         pub fn check_word_guess(&mut self, word: &str) -> WordGuessStatus {
             let binding = word.to_ascii_uppercase();
-            let mut actual_letters = binding.chars();
+            let actual_letters = binding.chars();
             let actual_letter_vec: Vec<char> = actual_letters.clone().collect();
 
             for index in 0..self.letter_guesses.len() {
                 if self.letter_guesses[index].letter == actual_letter_vec[index] {
                     self.letter_guesses[index].status = LetterGuessStatus::Correct;
-                } else if actual_letters.any(|l| l == self.letter_guesses[index].letter) {
+                } else if actual_letter_vec.contains(&self.letter_guesses[index].letter) {
                     self.letter_guesses[index].status = LetterGuessStatus::IncorrectPosition;
                 } else {
                     self.letter_guesses[index].status = LetterGuessStatus::Incorrect;
