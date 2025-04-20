@@ -1,6 +1,5 @@
 pub mod word_picker {
     use rand::prelude::IndexedRandom;
-    use rand::rng;
 
     pub fn pick_word() ->String{
         let words = vec!["train", "plane", "river", "rusty", "rover", "arise"];
