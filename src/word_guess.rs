@@ -123,7 +123,11 @@ pub mod word_guess {
                 WordGuessStatus::Incorrect
             };
 
-            return self.status.clone();
+            self.status.clone()
+        }
+
+        pub fn get_guessed_word(&self) -> String {
+            self.letter_guesses.iter().map(|l| l.letter).collect::<String>().to_ascii_lowercase()
         }
     }
 

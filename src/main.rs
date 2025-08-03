@@ -14,28 +14,34 @@ fn main() {
              LetterGuessStatus::Incorrect.to_string(),
              LetterGuessStatus::IncorrectPosition.to_string(),
              LetterGuessStatus::Correct.to_string());
-    let actual_word = word_picker::word_picker::pick_word();
+    let (actual_word, valid_words) = word_picker::word_picker::pick_word();
     println!("Guess the word:");
     let mut remaning_guesses = 5;
     while remaning_guesses > 0 {
-        if handle_guess(&actual_word) { return; }
+        if handle_guess(&actual_word, &valid_words) { return; }
         remaning_guesses -= 1;
     }
 }
 
-fn handle_guess(actual_word: &String) -> bool {
+fn handle_guess(actual_word: &String, valid_words: &Vec<String>) -> bool {
     let mut buffer = String::new();
     let stdin = io::stdin();
     _ = stdin.read_line(&mut buffer);
     let guess = WordGuess::from_str(buffer.trim());
     if guess.is_ok() {
         let mut guess = guess.unwrap();
-        let result = guess.check_word_guess(actual_word.as_str());
-        println!("{}", guess);
-        if result == WordGuessStatus::Correct
+        let is_valid = word_picker::word_picker::is_valid_word(guess.get_guessed_word(), &valid_words);
+        if !is_valid
         {
-            println!("Correct!");
-            return true;
+            println!("Invalid word!");
+        } else {
+            let result = guess.check_word_guess(actual_word.as_str());
+            println!("{}", guess);
+            if result == WordGuessStatus::Correct
+            {
+                println!("Correct!");
+                return true;
+            }
         }
     }
     false
