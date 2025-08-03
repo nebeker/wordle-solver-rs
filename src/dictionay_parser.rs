@@ -1,19 +1,24 @@
 pub mod dictionary_parser{
     use std::fs::File;
     use std::io;
-    use std::io::BufRead;
+    use std::io::{BufRead, BufReader};
     use std::path::Path;
 
-    pub fn parse_file_for_words(path: &str) -> Vec<String> {
+    pub fn parse_file_for_words(path: &str) -> Result<Vec<String>, io::Error> {
         let mut words: Vec<String> = Vec::new();
-        if let Ok(lines) = read_lines(path) {
-            for line in lines.map_while(Result::ok) {
-                if let Some(cleaned) = parse_word(&*line) {
-                    words.push(cleaned);
-                }
+        let mut word_count = 0;
+        let mut parsed_word_count = 0;
+        let file = File::open(path)?;
+        let mut reader = BufReader::new(file);
+        let mut line = String::new();
+        while reader.read_line(&mut line)? > 0 {
+            if let Some(cleaned) = parse_word(&*line) {
+                words.push(cleaned);
+                word_count += 1;
             }
+            parsed_word_count += 1;
         }
-        words
+        Ok(words)
     }
 
     fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>

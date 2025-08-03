@@ -3,11 +3,14 @@ pub mod word_picker {
     use crate::dictionay_parser::dictionary_parser;
 
     pub fn pick_word() ->(String,Vec<String>){
-        let words = dictionary_parser::parse_file_for_words("en-US.dic");
-
         let mut rng = rand::rng();
-
-        (words.choose(&mut rng).unwrap().to_string(),words)
+        if let Ok(words) = dictionary_parser::parse_file_for_words("./en-US.dic")
+        {
+            return (words.choose(&mut rng).unwrap().to_string(),words);
+        }
+        println!("Failed to read dictionary - using sample word list");
+        let words_list = vec![String::from("train"), String::from("plane")];
+        (words_list.choose(&mut rng).unwrap().to_string(), words_list)
     }
 
     pub fn is_valid_word(word: String, valid_words:&Vec<String>) -> bool {
