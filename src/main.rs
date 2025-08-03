@@ -1,6 +1,7 @@
 mod letter_guess;
 mod word_guess;
 mod word_picker;
+mod dictionay_parser;
 
 use std::io;
 use std::str::FromStr;
