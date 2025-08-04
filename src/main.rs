@@ -16,11 +16,12 @@ fn main() {
              LetterGuessStatus::Correct.to_string());
     let (actual_word, valid_words) = word_picker::word_picker::pick_word();
     println!("Guess the word:");
-    let mut remaning_guesses = 5;
-    while remaning_guesses > 0 {
+    let mut remaining_guesses = 5;
+    while remaining_guesses > 0 {
         if handle_guess(&actual_word, &valid_words) { return; }
-        remaning_guesses -= 1;
+        remaining_guesses -= 1;
     }
+    println!("The word was {}", actual_word);
 }
 
 fn handle_guess(actual_word: &String, valid_words: &Vec<String>) -> bool {
