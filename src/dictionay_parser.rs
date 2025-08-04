@@ -2,7 +2,6 @@ pub mod dictionary_parser{
     use std::fs::File;
     use std::io;
     use std::io::{BufRead, BufReader};
-    use std::path::Path;
 
     pub fn parse_file_for_words(path: &str) -> Result<Vec<String>, io::Error> {
         let mut words: Vec<String> = Vec::new();
@@ -19,12 +18,6 @@ pub mod dictionary_parser{
             parsed_word_count += 1;
         }
         Ok(words)
-    }
-
-    fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-    where P: AsRef<Path>, {
-        let file = File::open(filename)?;
-        Ok(io::BufReader::new(file).lines())
     }
 
     fn parse_word(word: &str) -> Option<String>{
