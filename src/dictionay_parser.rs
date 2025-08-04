@@ -3,7 +3,7 @@ use std::path::Path;
 pub mod dictionary_parser{
     use std::fs::File;
     use std::io;
-    use std::io::{BufRead, BufReader};
+    use std::io::BufRead;
     use std::path::Path;
 
     pub fn parse_file_for_words(path: &str) -> Result<Vec<String>, io::Error> {
