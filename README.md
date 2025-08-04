@@ -1,2 +1,2 @@
 # wordle-solver-rs
-Rust Wordle solver
+Hopeful Rust Wordle solver, current Rust Wordle clone.
