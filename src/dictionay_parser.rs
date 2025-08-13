@@ -30,7 +30,9 @@ pub mod dictionary_parser{
     }
 
     fn parse_word(word: &str) -> Option<String>{
-        let trimmed = word.trim().to_ascii_lowercase().trim_matches(|c:char| c == '\'' || c.is_numeric()).to_string();
+        let trimmed = word.trim().to_ascii_lowercase().chars().filter(
+            |c: &char| { *c != '\'' && !c.is_numeric() }
+        ).collect::<String>();
         let split_words: Vec<&str> = trimmed.split("/").collect();
 
         if let Some(result) = split_words.iter().next() {
@@ -63,7 +65,7 @@ pub mod dictionary_parser{
         }
 
         #[test]
-        fn five_letter_with_apostrophe_word_returnse(){
+        fn five_letter_with_apostrophe_word_returns(){
             let test_word = "D'Arcy";
             let result = parse_word(test_word);
             assert_eq!(result.is_some(), true);
