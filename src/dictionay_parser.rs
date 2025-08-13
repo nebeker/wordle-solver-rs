@@ -1,6 +1,5 @@
-use std::path::Path;
-
 pub mod dictionary_parser{
+    use std::collections::HashMap;
     use std::fs::File;
     use std::io;
     use std::io::BufRead;
@@ -43,6 +42,39 @@ pub mod dictionary_parser{
         None
     }
 
+    #[derive(Debug)]
+    pub struct LetterFrequencies
+    {
+        pub occurrences: HashMap<char, u32>
+    }
+
+    impl LetterFrequencies {
+        pub fn new() -> LetterFrequencies {
+            let occurrences = HashMap::new();
+            LetterFrequencies { occurrences: occurrences }
+        }
+
+        pub fn add_word_to_letter_frequencies(&mut self, word: String) {
+            for letter in word.chars() {
+                self.occurrences.insert(letter, self.occurrences.get(&letter).unwrap_or(&0) + 1);
+            }
+        }
+
+        pub fn to_string(&self) -> String {
+            let mut letter_frequencies = String::new();
+            for (letter, occurrences) in &self.occurrences {
+                letter_frequencies.push(*letter);
+                letter_frequencies.push(':');
+                letter_frequencies.push(' ');
+                for char in occurrences.to_string().chars() {
+                    letter_frequencies.push(char);
+                }
+                letter_frequencies.push(';');
+            }
+            letter_frequencies
+        }
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;
@@ -77,6 +109,43 @@ pub mod dictionary_parser{
             let result = parse_word(test_word);
             assert_eq!(result.is_some(), false);
             assert_eq!(result.is_none(), true);
+        }
+
+        #[test]
+        fn add_word_to_letter_frequencies_apple_four_letters() {
+            let mut letter_frequencies = LetterFrequencies::new();
+            letter_frequencies.add_word_to_letter_frequencies(String::from("apple"));
+
+            assert_eq!(letter_frequencies.occurrences.len(), 4);
+        }
+
+        #[test]
+        fn add_word_to_letter_frequencies_multiple_apple_four_letters() {
+            let mut letter_frequencies = LetterFrequencies::new();
+            letter_frequencies.add_word_to_letter_frequencies(String::from("apple"));
+            letter_frequencies.add_word_to_letter_frequencies(String::from("apple"));
+
+            assert_eq!(letter_frequencies.occurrences.len(), 4);
+        }
+
+        #[test]
+        fn add_word_to_letter_frequencies_multiple_words_four_e() {
+            let mut letter_frequencies = LetterFrequencies::new();
+            letter_frequencies.add_word_to_letter_frequencies(String::from("apple"));
+            letter_frequencies.add_word_to_letter_frequencies(String::from("fence"));
+            letter_frequencies.add_word_to_letter_frequencies(String::from("fires"));
+
+            assert_eq!(letter_frequencies.occurrences.get(&'e').unwrap(), &4);
+        }
+
+        #[test]
+        fn add_multiple_words_to_string(){
+            let mut letter_frequencies = LetterFrequencies::new();
+            letter_frequencies.add_word_to_letter_frequencies(String::from("apple"));
+            letter_frequencies.add_word_to_letter_frequencies(String::from("fence"));
+            letter_frequencies.add_word_to_letter_frequencies(String::from("fires"));
+
+            assert_eq!(letter_frequencies.to_string().len(), 5*10);
         }
     }
 }
