@@ -33,9 +33,8 @@ pub mod dictionary_parser{
         let trimmed = word.trim().to_ascii_lowercase().chars().filter(
             |c: &char| { *c != '\'' && !c.is_numeric() }
         ).collect::<String>();
-        let split_words: Vec<&str> = trimmed.split("/").collect();
 
-        if let Some(result) = split_words.iter().next() {
+        if let Some(result) = trimmed.split("/").next() {
             if result.len() == 5
             {
             return Some(result.to_string());
