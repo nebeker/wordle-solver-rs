@@ -45,19 +45,21 @@ pub mod dictionary_parser{
     #[derive(Debug)]
     pub struct LetterFrequencies
     {
-        pub occurrences: HashMap<char, u32>
+        pub occurrences: HashMap<char, u32>,
+        pub total_occurrences: u32
     }
 
     impl LetterFrequencies {
         pub fn new() -> LetterFrequencies {
             let occurrences = HashMap::new();
-            LetterFrequencies { occurrences: occurrences }
+            LetterFrequencies { occurrences: occurrences, total_occurrences: 0 }
         }
 
         pub fn add_word_to_letter_frequencies(&mut self, word: String) {
             for letter in word.chars() {
                 self.occurrences.insert(letter, self.occurrences.get(&letter).unwrap_or(&0) + 1);
             }
+            self.total_occurrences += word.len() as u32;
         }
 
         pub fn to_string(&self) -> String {
@@ -104,7 +106,7 @@ pub mod dictionary_parser{
         }
 
         #[test]
-        fn longer__word_returns_none(){
+        fn longer_word_returns_none(){
             let test_word = "Anglicanism/MS";
             let result = parse_word(test_word);
             assert_eq!(result.is_some(), false);
@@ -116,6 +118,7 @@ pub mod dictionary_parser{
             let mut letter_frequencies = LetterFrequencies::new();
             letter_frequencies.add_word_to_letter_frequencies(String::from("apple"));
 
+            assert_eq!(letter_frequencies.total_occurrences, 5);
             assert_eq!(letter_frequencies.occurrences.len(), 4);
         }
 
@@ -125,6 +128,7 @@ pub mod dictionary_parser{
             letter_frequencies.add_word_to_letter_frequencies(String::from("apple"));
             letter_frequencies.add_word_to_letter_frequencies(String::from("apple"));
 
+            assert_eq!(letter_frequencies.total_occurrences, 10);
             assert_eq!(letter_frequencies.occurrences.len(), 4);
         }
 
@@ -135,6 +139,7 @@ pub mod dictionary_parser{
             letter_frequencies.add_word_to_letter_frequencies(String::from("fence"));
             letter_frequencies.add_word_to_letter_frequencies(String::from("fires"));
 
+            assert_eq!(letter_frequencies.total_occurrences, 15);
             assert_eq!(letter_frequencies.occurrences.get(&'e').unwrap(), &4);
         }
 
